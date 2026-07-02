@@ -1,0 +1,45 @@
+model:
+  name: kongnet
+  n_channels: 3
+  n_classes: 2
+  base_features: 64
+  depth: 4
+
+dataset:
+  images_dir: /data_64T_3/Raja/CDH1/src_segmentation/dataset_augmentation/2.original_augmented_dataset_combined/patches
+  masks_dir:  /data_64T_3/Raja/CDH1/src_segmentation/dataset_augmentation/2.original_augmented_dataset_combined/masks
+  split_csv_dir: splits/dataset_augmented/split_train_val_test
+  # split_csv: splits/dataset_augmented/split_train_val_test/fold1.csv
+
+  img_size: [512, 512]
+  num_workers: 4
+  augment: true
+  val_split: 0.16
+  test_split: 0.2
+
+training:
+  fold_mode: kfold
+  n_folds: 5
+  seed: 42
+  eval_mode: train_val_test
+  epochs: 200
+  batch_size: 4
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  amp: true
+  early_stopping_patience: 35
+  loss: dice_ce
+
+optimizer:
+  name: adam
+  momentum: 0.9
+
+scheduler:
+  name: cosine
+  step_size: 30
+  gamma: 0.1
+  min_lr: 1.0e-6
+
+logging:
+  log_dir: logs/kongnet
+  log_interval: 10
