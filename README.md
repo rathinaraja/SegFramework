@@ -27,9 +27,9 @@
   - [4. Train](#4-train)
   - [5. Evaluate](#5-evaluate)
 - [Data split generation and data augmentation](#quick-start)
-  - [1. Split Generation - Random](#1-split-generation--random)
-  - [2. Split Generation - Patient-Level Stratified](#2-split-generation--patient-level-stratified)
-  - [3. Data Augmentation - Copy-Paste](#3-data-augmentation--copy-paste)
+  - [1. Split Generation: Random](#1-split-generation--random)
+  - [2. Split Generation: Patient-Level Stratified](#2-split-generation--patient-level-stratified)
+  - [3. Data Augmentation: Copy-Paste](#3-data-augmentation--copy-paste)
   - [4. Output Structure](#4-output-structure)
 - [Configuration Reference](#configuration-reference)
   - [Loss Functions](#loss-functions)
@@ -268,7 +268,7 @@ python test.py --config configs/unet.yaml \
 ---
 ## Data split generation and data augmentation
 
-## 1. Split Generation - Random
+## 1. Split Generation: Random
 
 **`utils/split_generator_random.py`**
 
@@ -311,7 +311,7 @@ python utils/split_generator_random.py \
 
 ---
 
-## 2. Split Generation - Patient-Level Stratified
+## 2. Split Generation: Patient-Level Stratified
 
 **`utils/split_generator_patient_level_stratified.py`**
 
@@ -346,7 +346,7 @@ Arguments are identical to the random generator above.
 
 ---
 
-## 3. Data Augmentation - Copy-Paste
+## 3. Data Augmentation: Copy-Paste
 
 **`utils/data_augmentation_copy_paste.py`**
 
