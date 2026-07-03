@@ -96,16 +96,21 @@ The segmentation framework enables pixel-level identification of SRC regions usi
 
 ## Implemented Models
 
-| # | Architecture | Type | Notes |
-|---|---|---|---|
-| 1 | **U-Net** | CNN | Classic encoder-decoder with skip connections |
-| 2 | **Attention U-Net** | CNN + Attention | Gated attention on skip connections |
-| 3 | **nnU-Net** | CNN | Self-configuring baseline |
-| 4 | **SegNet** | CNN | Encoder-decoder with max-pooling indices |
-| 5 | **UNet++** | CNN | Nested dense skip connections |
-| 6 | **SegFormer** | Transformer | Hierarchical ViT with lightweight decoder |
-| 7 | **SwinUNet** | Transformer | Pure Swin Transformer U-shaped network |
-| 8 | **TransUNet** | Hybrid | CNN encoder + Transformer bottleneck |
+| # | Architecture | Year | Type | Notes |
+|---|---|---|---|---|
+| 1 | **U-Net** | 2015 | CNN | Classic encoder-decoder with skip connections |
+| 2 | **SegNet** | 2015 | CNN | Encoder-decoder with max-pooling indices |
+| 3 | **Attention U-Net** | 2018 | CNN + Attention | Gated attention on skip connections |
+| 4 | **UNet++** | 2018 | CNN | Nested dense skip connections |
+| 5 | **nnU-Net** | 2021 | CNN | Self-configuring baseline |
+| 6 | **SegFormer** | 2021 | Transformer | Hierarchical ViT with lightweight MLP decoder |
+| 7 | **Swin-UNet** | 2021 | Transformer | Pure Swin Transformer U-shaped network |
+| 8 | **TransUNet** | 2024 | Hybrid | CNN encoder + Transformer bottleneck |
+| 9 | **SAM2-UNet** | 2024 | Foundation Model | Frozen ViT-B/16 encoder + adapters + UNet decoder |
+| 10 | **KongNet** | 2025 | CNN + Attention | SCSE attention; 1st place MIDOG/PUMA/MONKEY 2025 |
+| 11 | **MCP-MedSAM** | 2025 | Lightweight ViT | Lightweight SAM variant; single-GPU trainable |
+| 12 | **Swin-UMamba** | 2025 | Hybrid Mamba | Swin Transformer encoder + Mamba VSS decoder |
+| 13 | **SAMba-UNet** | 2026 | Hybrid Mamba | Frozen ViT encoder + Mamba bottleneck + conv decoder |
 
 ---
 
