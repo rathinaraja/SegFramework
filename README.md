@@ -26,6 +26,11 @@
   - [3. Configure](#3-configure)
   - [4. Train](#4-train)
   - [5. Evaluate](#5-evaluate)
+- [Data split generation and data augmentation](#quick-start)
+  - [1. Split Generation — Random](#1-split-generation--random)
+  - [2. Split Generation — Patient-Level Stratified](#2-split-generation--patient-level-stratified)
+  - [3. Data Augmentation — Copy-Paste](#3-data-augmentation--copy-paste)
+  - [4. Output Structure](#4-output-structure)
 - [Configuration Reference](#configuration-reference)
   - [Loss Functions](#loss-functions)
   - [Optimizers](#optimizers)
@@ -260,6 +265,186 @@ python test.py --config configs/unet.yaml \
     --save_preds
 ```
 
+---
+## Data split generation and data augmentation
+
+## 1. Split Generation — Random
+
+**`utils/split_generator_random.py`**
+
+Scans an image folder, collects all image filenames, and writes per-fold CSV split files. All models train on identical samples across folds.
+
+### Usage
+
+```bash
+# 5-fold cross-validation (all 4 eval modes)
+python utils/split_generator_random.py \
+    --images_dir  /data_64T_3/Raja/CDH1/src_segmentation/dataset_original/1.dataset/patches \
+    --output_dir  splits/dataset_original \
+    --dataset_name SRC \
+    --folds       5 \
+    --val_split   0.1 \
+    --test_split  0.2 \
+    --seed        42
+
+# Single fold, specific mode only
+python utils/split_generator_random.py \
+    --images_dir  /data_64T_3/Raja/CDH1/src_segmentation/dataset_original/1.dataset/patches \
+    --output_dir  splits/dataset_original \
+    --dataset_name SRC \
+    --folds       1 \
+    --modes       train_val_test train_val
+```
+
+### Arguments
+
+| Argument | Default | Description |
+|---|---|---|
+| `--images_dir` | required | Folder containing input image patches |
+| `--output_dir` | required | Root folder where CSV splits are written |
+| `--dataset_name` | required | Label used in output filenames (e.g. `SRC`) |
+| `--folds` | `5` | Number of folds (`1` = single random split) |
+| `--val_split` | `0.1` | Validation fraction (used when `folds=1`) |
+| `--test_split` | `0.2` | Test holdout fraction |
+| `--seed` | `42` | Random seed for reproducibility |
+| `--modes` | all 4 | Subset of eval modes to generate |
+
+---
+
+## 2. Split Generation — Patient-Level Stratified
+
+**`utils/split_generator_patient_level_stratified.py`**
+
+Same interface as the random generator but splits at the **slide level** — all tiles from the same slide always go to the same split, guaranteeing zero data leakage.
+
+### Filename pattern required
+
+```
+{slide_name}_x{XXXXXX}_y{YYYYYY}.ext
+
+Examples:
+  S08-38628 G11_x067376_y034486.png       →  slide: S08-38628 G11
+  SP-22-078912 A11-1_x012345_y067890.png  →  slide: SP-22-078912 A11-1
+```
+
+### Usage
+
+```bash
+python utils/split_generator_patient_level_stratified.py \
+    --images_dir  /data_64T_3/Raja/CDH1/src_segmentation/dataset_original/1.dataset/patches \
+    --output_dir  splits/dataset_original \
+    --dataset_name SRC \
+    --folds       5 \
+    --val_split   0.1 \
+    --test_split  0.2 \
+    --seed        42
+```
+
+Arguments are identical to the random generator above.
+
+> **Use this generator** when your dataset contains multiple tiles per slide (WSI patches). Use the random generator only when each image is an independent sample.
+
+---
+
+## 3. Data Augmentation — Copy-Paste
+
+**`utils/data_augmentation_copy_paste.py`**
+
+Augments mask–patch pairs by copying white-region tiles (foreground) into black-region areas (background) within the same image, to address class imbalance when masks contain >60% background.
+
+### Usage
+
+```bash
+python utils/data_augmentation_copy_paste.py \
+    --masks_dir       /data_64T_3/Raja/CDH1/src_segmentation/dataset_original/dataset_split/training/masks \
+    --patches_dir     /data_64T_3/Raja/CDH1/src_segmentation/dataset_original/dataset_split/training/patches \
+    --output_dir      /data_64T_3/Raja/CDH1/src_segmentation/dataset_augmentation/augmented_copy_paste \
+    --tile_size       64 \
+    --black_thresh    50 \
+    --apply_pct       100 \
+    --copies_per_mask 2 \
+    --seed            42
+```
+
+### Arguments
+
+| Argument | Default | Description |
+|---|---|---|
+| `--masks_dir` | required | Folder containing binary mask images |
+| `--patches_dir` | required | Folder with corresponding input patches |
+| `--output_dir` | required | Destination for augmented mask + patch pairs |
+| `--tile_size` | `64` | Size of the n×n copy tile in pixels |
+| `--black_thresh` | `60` | Min % of black pixels in mask to trigger augmentation |
+| `--apply_pct` | `100` | % of qualifying masks to augment (0–100) |
+| `--copies_per_mask` | `1` | Max white→black copy operations per mask |
+| `--seed` | `42` | Random seed for reproducibility |
+
+### How it works
+
+1. For each mask with `> black_thresh %` black pixels, finds white-region tiles (foreground source) and black-region locations (paste destinations)
+2. Copies the white tile and its corresponding patch region into the black area
+3. Tracks source and destination positions on separate occupancy grids to guarantee non-overlapping placements across all copies
+4. Saves augmented mask and patch pair to `--output_dir`
+
+---
+
+## 4. Output Structure
+
+### Split files (assumed already created)
+
+```
+splits/
+├── dataset_summary_SRC.csv                          ← slide inventory (stratified only)
+├── split_train_val_test/
+│   ├── split_train_val_test_SRC_fold1.csv           ← columns: train, val, test
+│   ├── split_train_val_test_SRC_fold2.csv
+│   ├── split_train_val_test_SRC_fold3.csv
+│   ├── split_train_val_test_SRC_fold4.csv
+│   └── split_train_val_test_SRC_fold5.csv
+├── split_train_val/
+│   └── split_train_val_SRC_fold{1..5}.csv           ← columns: train, val
+├── split_train_test/
+│   └── split_train_test_SRC_fold{1..5}.csv          ← columns: train, test
+└── split_training_only/
+    └── split_training_only_SRC_fold{1..5}.csv       ← column: train
+```
+
+Each CSV has one column per split. Rows are image filenames. Shorter columns are padded with `""` so all columns have equal length.
+
+### Augmented data
+
+```
+augmented_copy_paste/
+├── masks/
+│   ├── original_patch_aug1.png
+│   └── ...
+└── patches/
+    ├── original_patch_aug1.png
+    └── ...
+```
+
+Augmented files are saved alongside original filenames with an `_aug{N}` suffix. Pass the augmented folder path to `--images_dir` in the split generator to include augmented samples in training splits.
+
+---
+
+## Quick Reference
+
+```bash
+# Step 1 — Generate splits (patient-level, recommended for WSI tiles)
+python utils/split_generator_patient_level_stratified.py \
+    --images_dir /path/to/patches --output_dir splits/ \
+    --dataset_name SRC --folds 5 --seed 42
+
+# Step 2 — Augment training data (optional)
+python utils/data_augmentation_copy_paste.py \
+    --masks_dir /path/to/masks --patches_dir /path/to/patches \
+    --output_dir /path/to/augmented --copies_per_mask 2
+
+# Step 3 — Train any model using the generated splits
+python train.py --config configs/unet.yaml \
+    --splits_dir splits/split_train_val_test \
+    --output_dir Results --device cuda:0
+```
 ---
 
 ## Configuration Reference
