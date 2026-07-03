@@ -27,9 +27,9 @@
   - [4. Train](#4-train)
   - [5. Evaluate](#5-evaluate)
 - [Data split generation and data augmentation](#quick-start)
-  - [1. Split Generation — Random](#1-split-generation--random)
-  - [2. Split Generation — Patient-Level Stratified](#2-split-generation--patient-level-stratified)
-  - [3. Data Augmentation — Copy-Paste](#3-data-augmentation--copy-paste)
+  - [1. Split Generation - Random](#1-split-generation--random)
+  - [2. Split Generation - Patient-Level Stratified](#2-split-generation--patient-level-stratified)
+  - [3. Data Augmentation - Copy-Paste](#3-data-augmentation--copy-paste)
   - [4. Output Structure](#4-output-structure)
 - [Configuration Reference](#configuration-reference)
   - [Loss Functions](#loss-functions)
@@ -531,9 +531,9 @@ Utilities for split generation and data augmentation, located in `utils/`.
 
 ---
 
-1. [Split Generation — Random](#1-split-generation--random)
-2. [Split Generation — Patient-Level Stratified](#2-split-generation--patient-level-stratified)
-3. [Data Augmentation — Copy-Paste](#3-data-augmentation--copy-paste)
+1. [Split Generation - Random](#1-split-generation--random)
+2. [Split Generation - Patient-Level Stratified](#2-split-generation--patient-level-stratified)
+3. [Data Augmentation - Copy-Paste](#3-data-augmentation--copy-paste)
 4. [Output Structure](#4-output-structure)
 
 ---
