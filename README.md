@@ -268,7 +268,7 @@ python test.py --config configs/unet.yaml \
 ---
 ## Data split generation and data augmentation
 
-## 1. Split Generation — Random
+## 1. Split Generation - Random
 
 **`utils/split_generator_random.py`**
 
@@ -311,7 +311,7 @@ python utils/split_generator_random.py \
 
 ---
 
-## 2. Split Generation — Patient-Level Stratified
+## 2. Split Generation - Patient-Level Stratified
 
 **`utils/split_generator_patient_level_stratified.py`**
 
@@ -346,7 +346,7 @@ Arguments are identical to the random generator above.
 
 ---
 
-## 3. Data Augmentation — Copy-Paste
+## 3. Data Augmentation - Copy-Paste
 
 **`utils/data_augmentation_copy_paste.py`**
 
